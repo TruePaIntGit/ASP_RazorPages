@@ -46,5 +46,26 @@ namespace RazorPages.Pages.Students
             }
             Students = await students.AsNoTracking().ToListAsync();
         }
+        public async Task OnPostAsync(string sortOrder, string searchString)
+        {
+            NameSort = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            DateSort = sortOrder == "Date" ? "date_desc" : "Date";
+            CurrentFilter = searchString;
+
+            Students = await _context.Students.ToListAsync();
+            IQueryable<Student> students = from student in _context.Students select student;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.LastName.Contains(searchString) || s.FirstName.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc": students = students.OrderByDescending(s => s.LastName); break;
+                case "date_desc": students = students.OrderByDescending(s => s.EnrollmentDate); break;
+                case "Date": students = students.OrderByDescending(s => s.EnrollmentDate); break;
+                default: students = students.OrderByDescending(s => s.ID); break;
+            }
+            Students = await students.AsNoTracking().ToListAsync();
+        }
     }
 }
