@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<ContosoUniversityContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ContosoUniversityContext") ?? throw new InvalidOperationException("Connection string 'ContosoUniversityContext' not found.")));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,10 +25,10 @@ else
     app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
 }
-using (IServiceScope scope = app.Services.CreateScope())
+using (IServiceScope scope =  app.Services.CreateScope())
 {
-    IServiceProvider service = scope.ServiceProvider;
-    ContosoUniversityContext context = service.GetRequiredService<ContosoUniversityContext>();
+    IServiceProvider services = scope.ServiceProvider;
+    ContosoUniversityContext context = services.GetRequiredService<ContosoUniversityContext>();
     context.Database.EnsureCreated();
     DbInitializer.Initialize(context);
 }

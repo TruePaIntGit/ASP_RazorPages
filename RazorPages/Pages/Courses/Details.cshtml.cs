@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using RazorPages.Data;
 using RazorPages.Models;
 
-namespace RazorPages.Pages.Students
+namespace RazorPages.Pages.Courses
 {
     public class DetailsModel : PageModel
     {
@@ -19,7 +19,7 @@ namespace RazorPages.Pages.Students
             _context = context;
         }
 
-        public Student Student { get; set; } = default!;
+        public Course Course { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,19 +28,14 @@ namespace RazorPages.Pages.Students
                 return NotFound();
             }
 
-            //var student = await _context.Students.FirstOrDefaultAsync(m => m.ID == id);
-            Student? student = await _context.Students
-                .Include(s => s.Enrollments)
-                .ThenInclude(e => e.Course)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (student == null)
+            Course course = await _context.Courses.AsNoTracking().Include(c => c.Department).FirstOrDefaultAsync(m => m.CourseID == id);
+            if (course == null)
             {
                 return NotFound();
             }
             else
             {
-                Student = student;
+                Course = course;
             }
             return Page();
         }
